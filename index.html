@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>YWP ぷにパズル (繋ぎ消し)</title>
+  <!--
+    YouTube Playables SDK。**必ず head に置き、他のどの script よりも先**にする (公式要件)。
+      https://developers.google.com/youtube/gaming/playables/reference/getting_started
+    ★★body ではなく head に置くこと。ビルドすると Vite が
+      **バンドル script(type=module) を head の末尾へ持ち上げる**ので、この tag を body に置くと
+      dist/index.html では**ゲームコードが 1 番目の script になり SDK が後ろへ回る**。
+      dev は index.html をそのまま配るため body でも正しい順序に見えてしまい、**気付けない**。
+      Portal のアップロード検査は
+      "Entry point HTML does not contain SDK as first script" で弾く(実際に弾かれた)。
+    ★コメントアウトしてはいけない。SDK が無いと ytgame.system.getLanguage() が使えず、
+      **言語判定が起動せずに既定(日本語)で固定される**＝「英語対応が必須」という審査要件を
+      満たせなくなる(以前ここをコメントにしていたため、入稿ビルドが日本語しか出せなかった)。
+    順序と有効性は scripts/sdkScriptOrderTest.mjs (npm test) と
+      pack-dist.mjs / pack-submission.mjs が**ビルド後の html** で機械チェックする。
+    ローカル(dev/preview/配布キット)では取得に失敗して window.ytgame が生えないだけで、
+      youtubePlayables.js が安全に no-op へ倒れる(起動は妨げない)。
+  -->
+  <script src="https://www.youtube.com/game_api/v1" nonce="zWp2Q7zSo21Ug3QMB27Eiw"></script>
+  <style>
+    /* 起動直後はタイトルの .dat が届くまで何も描かれないので、この背景がそのまま
+       「起動中の画面」になる。PixiJS の clear 色(bootstrap の background)と同色にする。 */
+    html, body { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; }
+    /* ★`inset: 0` は書かない(**Chrome 87** で追加。サポート下限の XZ3 = Chrome 83 では
+       宣言ごと黙って無視される)。ここは `resizeTo: window` で canvas 自身が画面サイズに
+       なるため無視されても実害は出ていなかったが、**気付けない差**なので個別指定にしておく。 */
+    #app { position: fixed; top: 0; right: 0; bottom: 0; left: 0; }
+    #hud {
+      position: fixed; left: 8px; top: 8px; z-index: 10;
+      font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+      color: #d8e0ee; background: rgba(0,0,0,.45); padding: 6px 8px; border-radius: 6px;
+      white-space: pre; pointer-events: none;
+    }
+    /* 中身が空のときは枠ごと消す。padding と背景があるので、空文字を入れただけだと
+       左上に小さな黒い箱が残る（シーン遷移で SceneManager が textContent を空にする）。
+       :empty なので、main.js が致命エラーを書き込んだときは従来どおり表示される。 */
+    #hud:empty { display: none; }
+  </style>
+  <script type="module" crossorigin src="./assets/index-CMgiXgEd.js" nonce="zWp2Q7zSo21Ug3QMB27Eiw"></script>
+  <link rel="modulepreload" crossorigin href="./assets/preload-helper-kNaey6uv.js">
+  <link rel="modulepreload" crossorigin href="./assets/chunk-QTnfLwEv.js">
+  <link rel="modulepreload" crossorigin href="./assets/Geometry-DHg4pYyH.js">
+  <link rel="modulepreload" crossorigin href="./assets/RenderTargetSystem-DALzXY-N.js">
+  <link rel="modulepreload" crossorigin href="./assets/getTextureBatchBindGroup-CDPp3teN.js">
+  <link rel="modulepreload" crossorigin href="./assets/canvasUtils-vbTkuuNQ.js">
+  <link rel="modulepreload" crossorigin href="./assets/CanvasRenderer-B1Nqw2ew.js">
+  <link rel="modulepreload" crossorigin href="./assets/BufferResource-BT3FMa7R.js">
+  <link rel="modulepreload" crossorigin href="./assets/CanvasPool-rkbEJ2j6.js">
+</head>
+<body>
+  <div id="app"></div>
+  <div id="hud">loading…</div>
+
+</body>
+</html>
